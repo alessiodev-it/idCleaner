@@ -1,7 +1,8 @@
+# ONLY LOWERCASE
 services:
-  idCleaner:
+  idcleaner:
     build: .
-    container_name: idCleaner
+    container_name: idcleaner
     restart: unless-stopped
     env_file:
       - .env
@@ -10,9 +11,9 @@ services:
       - ./records:/app/records
     labels:
       - "homepage.group=Products"
-      - "homepage.name=idCleaner"
+      - "homepage.name=idcleaner"
       - "homepage.icon=si-python"
       - "homepage.description=Fixing your gmail"
       - "homepage.server=my-docker"
       - "homepage.widget.type=docker"
-      - "homepage.widget.container=idCleaner"
+      - "homepage.widget.container=idcleaner"

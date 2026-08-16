@@ -10,7 +10,7 @@ WORKDIR /app
 
 # no pip dependencies
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends <LIBRARY> \
+    && apt-get install -y --no-install-recommends libmagic1 \
     && rm -rf /var/lib/apt/lists/*
 
 # requirements.txt
