@@ -1,6 +1,6 @@
 # idCleaner
 
-Finally. My inbox is clean, and it feels so good.
+*Finally. My inbox is clean, and it feels so good.*
 
 ---
 
@@ -87,7 +87,7 @@ The program runs continuously, scanning folders every 5 minutes. It can be manag
 
 ---
 
-## File Structure (Core)
+## File Structure
 
 ```
 idCleaner/
@@ -131,3 +131,7 @@ See `requirements.txt` for exact versions.
 
 ## License
 GNU General Public License v3
+
+---
+
+*Maintained by [Alessio Iacoviello](https://github.com/alessiodev-it) — built for resilience, designed for automation.*
