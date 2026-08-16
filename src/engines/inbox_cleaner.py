@@ -15,11 +15,9 @@ from .helpers.questions import (
 from .helpers.actions import unsubscribe_from
 from src.network import network
 
-
 class InboxFolderCleaner(BaseFolderCleaner):
     def __init__(self, thread_name, folder_name, stopper, record, imap_data, smtp_data, vt_groq_data, queue_update, shared_lists):
         super().__init__(thread_name, folder_name, stopper, record, imap_data, shared_lists=shared_lists)
-
         self.smtp_data = smtp_data
         self.vt_groq_data = vt_groq_data
         self.queue_update = queue_update

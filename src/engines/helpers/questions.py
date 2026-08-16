@@ -15,22 +15,18 @@ from .constants import (
 )
 from src.network import network
 
-
 def has_unsubscribe_header(msg):
     return 'list-unsubscribe' in msg.headers
-
 
 def has_malware(msg):
     if msg.attachments:
         return any(att.filename.lower().endswith(BAD_EXT) for att in msg.attachments)
     return False
 
-
 def has_suspicious_docs(msg) -> bool:
     if msg.attachments:
         return any(att.filename.lower().endswith(SUSPICIOUS_EXT) for att in msg.attachments)
     return False
-
 
 def has_spy_pixel(msg):
     html_body = msg.html.lower() if msg.html else ""
@@ -51,7 +47,6 @@ def has_spy_pixel(msg):
             return True
 
     return False
-
 
 @network.online
 def has_malevolent_text(msg, vt_groq_data: dict) -> bool:
@@ -132,7 +127,6 @@ def has_malevolent_text(msg, vt_groq_data: dict) -> bool:
 
     return False
 
-
 def is_promotional(msg):
     for param in PROMOTIONAL_PARAMS:
         if param in msg.headers:
@@ -150,13 +144,11 @@ def is_promotional(msg):
 
     return False
 
-
 def is_expired(msg, max_days):
     email_date = msg.date
     from datetime import datetime, timezone
     now = datetime.now(timezone.utc) if email_date.tzinfo else datetime.now()
     return (now - email_date).days > max_days
-
 
 def is_only_text(msg):
     return not bool(msg.attachments)

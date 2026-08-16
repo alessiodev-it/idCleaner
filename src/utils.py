@@ -68,9 +68,9 @@ DEFAULT_LISTS = {
 }
 
 DEFAULT_ENV = [
-    "imap_host", "imap_port", "imap_username", "imap_password",
-    "smtp_host", "smtp_port", "smtp_username", "smtp_password",
-    "vt_api_key", "groq_api_key"
+    "IMAP_HOST", "IMAP_PORT", "IMAP_USERNAME", "IMAP_PASSWORD",
+    "SMTP_HOST", "SMTP_PORT", "SMTP_USERNAME", "SMTP_PASSWORD",
+    "VT_API_KEY", "GROQ_API_KEY"
 ]
 
-DEFAULT_STATE = {"first_time": True}
+DEFAULT_STATE = {"FIRST_TIME": True}

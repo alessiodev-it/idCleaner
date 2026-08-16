@@ -5,7 +5,6 @@ from urllib.parse import parse_qs
 from email.message import EmailMessage
 from src.network import network
 
-
 @network.online
 def unsubscribe_from(msg, smtp_data=None):
     headers = msg.headers.get('list-unsubscribe', [])

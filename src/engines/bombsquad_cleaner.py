@@ -4,11 +4,9 @@ from .base_cleaner import BaseFolderCleaner
 from .helpers.security.deep_scanner import DeepScanner
 from src.network import network
 
-
 class BombSquadFolderCleaner(BaseFolderCleaner):
     def __init__(self, thread_name, folder_name, stopper, record, imap_data, vt_groq_data, queue_update):
         super().__init__(thread_name, folder_name, stopper, record, imap_data)
-
         self.vt_groq_data = vt_groq_data or {}
         self.queue_update = queue_update
         self.scanner = DeepScanner(logger=self.record)

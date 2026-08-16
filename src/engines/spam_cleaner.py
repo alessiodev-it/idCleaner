@@ -4,7 +4,6 @@ from src.utils import FOLDER_NAMES
 from .base_cleaner import BaseFolderCleaner
 from src.network import network
 
-
 class SpamFolderCleaner(BaseFolderCleaner):
     def __init__(self, thread_name, folder_name, stopper, record, imap_data, shared_lists=None):
         super().__init__(thread_name, folder_name, stopper, record, imap_data, shared_lists=shared_lists)

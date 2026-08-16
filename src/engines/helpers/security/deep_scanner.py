@@ -1,11 +1,8 @@
 import io, math, zipfile
 import magic, pefile, yara
-
 from pathlib import Path
 from oletools.olevba import VBA_Parser
-
 from ..constants import BAD_EXT, SUSPICIOUS_EXT
-
 
 class DeepScanner:
     def __init__(self, logger=None):

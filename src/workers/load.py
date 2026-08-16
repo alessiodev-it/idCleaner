@@ -3,12 +3,11 @@ from tools.recorder.recorder import Recorder
 from pathlib import Path
 import os, json, queue
 
-
 def json_data(stopper, queue_mail, queue_update):
-    record = Recorder(Path(os.getenv("recorder_loader_json_path")))
+    record = Recorder(Path(os.getenv("RECORDER_LOADER_JSON_PATH")))
 
-    list_path = os.getenv("list_path")
-    raw_list_path = os.getenv("raw_list_path")
+    list_path = os.getenv("LIST_PATH")
+    raw_list_path = os.getenv("RAW_LIST_PATH")
 
     last_payload = None
     file_need_update = False
@@ -79,7 +78,7 @@ def json_data(stopper, queue_mail, queue_update):
             record(f"Exception: {e}")
 
         polling(stopper, 60)
-# ========== ========== ==========
+
 
 def _fix_lists(w, b, g):
     clean_w = w

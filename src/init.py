@@ -58,24 +58,24 @@ def _data():
     if not list_path.exists() or list_path.stat().st_size == 0:
         with open(list_path, "w", encoding="utf-8") as f:
             json.dump(DEFAULT_LISTS, f, indent=2)
-    os.environ["list_path"] = str(list_path.resolve())
+    os.environ["LIST_PATH"] = str(list_path.resolve())
 
     state_path = data_dir / "state.json"
     if not state_path.exists() or state_path.stat().st_size == 0:
         with open(state_path, "w", encoding="utf-8") as f:
             json.dump(DEFAULT_STATE, f, indent=2)
-    os.environ["state_path"] = str(state_path.resolve())
+    os.environ["STATE_PATH"] = str(state_path.resolve())
 
     try:
         with open(state_path, "r", encoding="utf-8") as f:
             state_data = json.load(f)
-            os.environ["first_time"] = str(state_data.get("first_time", True))
+            os.environ["FIRST_TIME"] = str(state_data.get("first_time", True))
     except Exception:
-        os.environ["first_time"] = "True"
+        os.environ["FIRST_TIME"] = "True"
 
     raw_list_path = data_dir / "raw_list.txt"
     raw_list_path.touch(exist_ok=True)
-    os.environ["raw_list_path"] = str(raw_list_path.resolve())
+    os.environ["RAW_LIST_PATH"] = str(raw_list_path.resolve())
 
 
 def _recorders():
@@ -84,40 +84,40 @@ def _recorders():
 
     sub_records_dir = records_dir / "mail_worker"
     sub_records_dir.mkdir(exist_ok=True, parents=True)
-    os.environ[f"recorder_{sub_records_dir.name}_path"] = str(sub_records_dir / f"{sub_records_dir.name}.json")
-    os.environ["recorder_main_path"] = str(records_dir / "main.json")
+    os.environ[f"RECORDER_{sub_records_dir.name}_PATH"] = str(sub_records_dir / f"{sub_records_dir.name}.json")
+    os.environ["RECORDER_MAIN_PATH"] = str(records_dir / "main.json")
 
     for t_name in THREAD_NAMES:
         if t_name != "mail_worker":
-            os.environ[f"recorder_{t_name}_path"] = str(records_dir / f"{t_name}.json")
+            os.environ[f"RECORDER_{t_name}_PATH"] = str(records_dir / f"{t_name}.json")
 
     for t_name in SUB_THREAD_NAMES:
-        os.environ[f"recorder_{t_name}_path"] = str(sub_records_dir / f"{t_name}.json")
+        os.environ[f"RECORDER_{t_name}_PATH"] = str(sub_records_dir / f"{t_name}.json")
 
 
 """
 ENVIRONMENT VARIABLES:
     STATE:
-        first_time
+        FIRST_TIME
 
     API:
-        imap_host, imap_port, imap_username, imap_password,
-        smtp_host, smtp_port, smtp_username, smtp_password,
-        vt_api_key, groq_api_key
+        IMAP_HOST, IMAP_PORT, IMAP_USERNAME, IMAP_PASSWORD,
+        SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD,
+        VT_API_KEY, GROQ_API_KEY
 
     DATA:
-        list_path
-        state_path
-        raw_list_path
+        LIST_PATH
+        STATE_PATH
+        RAW_LIST_PATH
 
     RECORDERS:
-        recorder_main_path
-        recorder_loader_json_path
-        recorder_mail_worker_path
-            recorder_inbox_cleaner_path
-            recorder_spam_cleaner_path
-            recorder_bin_cleaner_path
-        recorder_identity_worker_path
+        RECORDER_MAIN_PATH
+        RECORDER_LOADER_JSON_PATH
+        RECORDER_MAIL_WORKER_PATH
+            RECORDER_INBOX_CLEANER_PATH
+            RECORDER_SPAM_CLEANER_PATH
+            RECORDER_BIN_CLEANER_PATH
+        RECORDER_IDENTITY_WORKER_PATH
 
-    Access: os.getenv('name')
+    Access: os.getenv('NAME')
 """
