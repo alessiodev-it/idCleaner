@@ -1,0 +1,18 @@
+services:
+  idCleaner:
+    build: .
+    container_name: idCleaner
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./records:/app/records
+    labels:
+      - "homepage.group=Products"
+      - "homepage.name=idCleaner"
+      - "homepage.icon=si-python"
+      - "homepage.description=Fixing your gmail"
+      - "homepage.server=my-docker"
+      - "homepage.widget.type=docker"
+      - "homepage.widget.container=idCleaner"

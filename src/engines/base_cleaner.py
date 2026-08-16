@@ -9,7 +9,7 @@ import os, json
 
 class BaseFolderCleaner(Thread, ABC):
     def __init__(self, thread_name, folder_name, stopper, record, imap_data, shared_lists=None):
-        super().__init__(name = thread_name, daemon = True)
+        super().__init__(name=thread_name, daemon=True)
 
         self.folder_name = folder_name
         self.stopper = stopper
@@ -33,7 +33,7 @@ class BaseFolderCleaner(Thread, ABC):
                         self._applying(mailbox, categories)
 
             except Exception as e:
-                self.record.write(f"Error in base cleaner: {e}")
+                self.record(f"Error in base cleaner: {e}")
 
             polling(self.stopper, 60*5)
 
@@ -47,8 +47,6 @@ class BaseFolderCleaner(Thread, ABC):
     @abstractmethod
     def _applying(self, mailbox, categories):
         pass
-    # ========== ========== ==========
-
 
     def _first_time_cleaning(self, mailbox):
         def update_state():
@@ -61,17 +59,16 @@ class BaseFolderCleaner(Thread, ABC):
                     f.seek(0)
                     json.dump(data, f, indent=2)
                     f.truncate()
-                self.record.write("First Run: State 'first_time' updated to False.")
-        # ========== ==========
+                self.record("First Run: State 'first_time' updated to False.")
 
         if (os.getenv("first_time") or "").lower() != "true": return
         if self.folder_name == FOLDER_NAMES["bin"]: return
 
-        self.record.write(f"First Run: Starting initial cleanup for '{self.folder_name}'...")
+        self.record(f"First Run: Starting initial cleanup for '{self.folder_name}'...")
         old_uids = mailbox.uids(AND(date_lt=date.today() - timedelta(days=60)))
 
         if old_uids:
-            self.record.write(f"First Run: Moving {len(old_uids)} expired messages to trash...")
+            self.record(f"First Run: Moving {len(old_uids)} expired messages to trash...")
             chunk_size = 500
             for i in range(0, len(old_uids), chunk_size):
                 if self.stopper.is_set(): return
@@ -80,8 +77,8 @@ class BaseFolderCleaner(Thread, ABC):
                 try:
                     mailbox.move(chunk, FOLDER_NAMES["bin"])
                 except Exception as e:
-                    self.record.write(f"First Run Error moving batch: {e}")
+                    self.record(f"First Run Error moving batch: {e}")
         else:
-            self.record.write("First Run: No expired messages found.")
+            self.record("First Run: No expired messages found.")
 
         update_state()

@@ -9,7 +9,17 @@ __pycache__/
 .venv/
 venv/
 
-# future data files
+# Secrets and metadata
 .env
 data/
 records/
+
+# Git
+.git/
+.gitignore
+README.md
+
+# Docker
+Dockerfile
+docker-compose.yaml
+.dockerignore

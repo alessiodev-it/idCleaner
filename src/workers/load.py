@@ -13,7 +13,6 @@ def json_data(stopper, queue_mail, queue_update):
     last_payload = None
     file_need_update = False
 
-
     while not stopper.is_set():
         try:
             with open(list_path, "r", encoding="utf-8") as f:
@@ -51,7 +50,7 @@ def json_data(stopper, queue_mail, queue_update):
                 with open(list_path, "w", encoding="utf-8") as f:
                     json.dump(data, f, indent=2, ensure_ascii=False)
                 file_need_update = False
-                record.write("Payload synced with file")
+                record("Payload synced with file")
 
             w = set(data.get("whitelist", []))
             b = set(data.get("blacklist", []))
@@ -67,21 +66,20 @@ def json_data(stopper, queue_mail, queue_update):
             if current_payload != last_payload:
                 queue_mail.put(current_payload)
                 last_payload = current_payload
-                record.write("Update sent to threads")
+                record("Update sent to threads")
 
                 _update_raw_list(raw_list_path, last_payload)
-                record.write("Payload synced with raw file")
+                record("Payload synced with raw file")
 
         except FileNotFoundError:
-            record.write("List file not found")
+            record("List file not found")
         except json.JSONDecodeError:
-            record.write("JSON decode error")
+            record("JSON decode error")
         except Exception as e:
-            record.write(f"Exception: {e}")
+            record(f"Exception: {e}")
 
         polling(stopper, 60)
 # ========== ========== ==========
-
 
 def _fix_lists(w, b, g):
     clean_w = w

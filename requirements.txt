@@ -1,6 +1,7 @@
 imap_tools==1.13.0
 oletools==0.60.2
 pefile==2024.8.26
+pyprojroot==0.3.0
 python-dotenv==1.2.2
 python_magic==0.4.27
 Requests==2.34.2

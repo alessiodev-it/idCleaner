@@ -5,42 +5,41 @@ def handle_subthreads(threads, stopper, record=None):
     for t in threads:
         t.start()
         if record:
-            record.write(f"Sub thread [{t.name}] spawned.")
+            record(f"Sub thread [{t.name}] spawned.")
 
-    # The sub-worker simply waits until the main stopper is set
     stopper.wait()
 
     for t in threads:
         t.join()
         if record:
-            record.write(f"Sub thread [{t.name}] joined.")
+            record(f"Sub thread [{t.name}] joined.")
 
 
 def handle_threads(threads, stopper, record=None):
     for t in threads:
         t.start()
         if record:
-            record.write(f"Core thread [{t.name}] spawned.")
+            record(f"Core thread [{t.name}] spawned.")
 
     try:
         while not stopper.is_set():
             stopper.wait(timeout=1.0)
     except Exception as e:
         if record:
-            record.write(str(e))
+            record(str(e))
     except KeyboardInterrupt:
         if record:
-            record.write("Keyboard interrupt")
+            record("Keyboard interrupt")
     finally:
         stopper.set()
 
         for t in threads:
             t.join()
             if record:
-                record.write(f"Core thread [{t.name}] killed")
+                record(f"Core thread [{t.name}] killed")
 
         if record:
-            record.write("Script closed")
+            record("Script closed")
             record.join()
 # ========== ========== ==========
 
@@ -51,6 +50,7 @@ def polling(stopper, seconds):
         time.sleep(1)
 # ========== ========== ==========
 
+
 FOLDER_NAMES = {
     "inbox": "INBOX",
     "spam": "[Gmail]/Spam",
@@ -60,7 +60,6 @@ FOLDER_NAMES = {
 
 THREAD_NAMES = ["loader_json", "mail_worker", "identity_worker"]
 SUB_THREAD_NAMES = ["inbox_cleaner", "spam_cleaner", "bin_cleaner", "bombsquad_cleaner"]
-# ========== ========== ==========
 
 DEFAULT_LISTS = {
     "whitelist": [],
@@ -75,4 +74,3 @@ DEFAULT_ENV = [
 ]
 
 DEFAULT_STATE = {"first_time": True}
-# ========== ========== ==========

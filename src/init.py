@@ -1,3 +1,8 @@
+import json, os
+from pathlib import Path
+from dotenv import load_dotenv, find_dotenv
+from pyprojroot import here
+
 from src.utils import (
     THREAD_NAMES,
     SUB_THREAD_NAMES,
@@ -5,53 +10,51 @@ from src.utils import (
     DEFAULT_ENV,
     DEFAULT_STATE
 )
-from tools.locator.locator import locate_file
+from tools.recorder.recorder import Recorder
 
-from pathlib import Path
-from dotenv import load_dotenv
-import os, json
+ROOT_DIR = here()
+_PRINT = True
 
 
-def api():
-    env_is_incomplete = False
-    _env = locate_file(".env")
+def bootstrap():
+    records_dir = ROOT_DIR / "records"
+    records_dir.mkdir(exist_ok=True, parents=True)
 
-    if not _env:
-        _env = locate_file("main.py").parent / ".env"
-        with open(_env, "w", encoding="utf-8") as f:
+    with Recorder(records_dir / "bootstrap.json", _print=_PRINT) as rec:
+        for step in (_api, _data, _recorders):
+            try:
+                step()
+            except Exception as e:
+                err_msg = f"Bootstrap failed during '{step.__name__}': {e}"
+                rec(err_msg)
+                sys.exit(err_msg)
+#  ========== ========== ==========
+
+def _api():
+    env_file = find_dotenv()
+
+    if not env_file:
+        env_file = ROOT_DIR / ".env"
+        with open(env_file, "w", encoding="utf-8") as f:
             f.write("\n".join([f"{k}=" for k in DEFAULT_ENV]))
-        env_is_incomplete = True
 
-    load_dotenv(_env, override=True)
+    load_dotenv(env_file, override=True)
 
-    for k in DEFAULT_ENV:
-        if not os.getenv(k):
-            env_is_incomplete = True
-
-    if env_is_incomplete:
+    if any(not os.getenv(k) for k in DEFAULT_ENV):
         raise RuntimeError("Environment variables incomplete. Please fill the .env file.")
 
 
-def data():
-    exclude = ["tools", "__pycache__"]
-    main_py = locate_file("main.py", exclude=exclude)
-    data_dir = main_py.parent / "data"
+def _data():
+    data_dir = ROOT_DIR / "data"
     data_dir.mkdir(exist_ok=True, parents=True)
 
-    list_path = locate_file("list.json", exclude=exclude)
-    if not list_path:
-        list_path = data_dir / "list.json"
-
+    list_path = data_dir / "list.json"
     if not list_path.exists() or list_path.stat().st_size == 0:
         with open(list_path, "w", encoding="utf-8") as f:
             json.dump(DEFAULT_LISTS, f, indent=2)
-
     os.environ["list_path"] = str(list_path.resolve())
 
-    state_path = locate_file("state.json", exclude=exclude)
-    if not state_path:
-        state_path = data_dir / "state.json"
-
+    state_path = data_dir / "state.json"
     if not state_path.exists() or state_path.stat().st_size == 0:
         with open(state_path, "w", encoding="utf-8") as f:
             json.dump(DEFAULT_STATE, f, indent=2)
@@ -61,7 +64,7 @@ def data():
         with open(state_path, "r", encoding="utf-8") as f:
             state_data = json.load(f)
             os.environ["first_time"] = str(state_data.get("first_time", True))
-    except:
+    except Exception:
         os.environ["first_time"] = "True"
 
     raw_list_path = data_dir / "raw_list.txt"
@@ -69,20 +72,18 @@ def data():
     os.environ["raw_list_path"] = str(raw_list_path.resolve())
 
 
-def recorders():
-    records_dir = locate_file("main.py").parent / "records"
+def _recorders():
+    records_dir = ROOT_DIR / "records"
     records_dir.mkdir(exist_ok=True, parents=True)
 
     sub_records_dir = records_dir / "mail_worker"
     sub_records_dir.mkdir(exist_ok=True, parents=True)
     os.environ[f"recorder_{sub_records_dir.name}_path"] = str(sub_records_dir / f"{sub_records_dir.name}.json")
-
     os.environ["recorder_main_path"] = str(records_dir / "main.json")
 
     for t_name in THREAD_NAMES:
-        if t_name == "mail_worker":
-            continue
-        os.environ[f"recorder_{t_name}_path"] = str(records_dir / f"{t_name}.json")
+        if t_name != "mail_worker":
+            os.environ[f"recorder_{t_name}_path"] = str(records_dir / f"{t_name}.json")
 
     for t_name in SUB_THREAD_NAMES:
         os.environ[f"recorder_{t_name}_path"] = str(sub_records_dir / f"{t_name}.json")

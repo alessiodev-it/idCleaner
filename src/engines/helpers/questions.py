@@ -13,6 +13,7 @@ from .constants import (
     URL_SHORTENERS,
     GROQ_SECURITY_SYSTEM_PROMPT
 )
+from src.network import network
 
 
 def has_unsubscribe_header(msg):
@@ -52,6 +53,7 @@ def has_spy_pixel(msg):
     return False
 
 
+@network.online
 def has_malevolent_text(msg, vt_groq_data: dict) -> bool:
     groq_url = "https://api.groq.com/openai/v1/chat/completions"
 
@@ -83,7 +85,6 @@ def has_malevolent_text(msg, vt_groq_data: dict) -> bool:
     if score >= 80:
         return True
 
-    # Escalation 1: VirusTotal (skipped if key is empty or no URLs found)
     if urls and vt_key:
         for url in urls[:3]:
             try:
@@ -97,7 +98,6 @@ def has_malevolent_text(msg, vt_groq_data: dict) -> bool:
             except Exception:
                 pass
 
-    # Escalation 2: Groq Cloud AI with retry mechanism, timeout, and minimal max_tokens
     if groq_key:
         payload = {
             "model": "llama-3.1-8b-instant",
@@ -134,7 +134,6 @@ def has_malevolent_text(msg, vt_groq_data: dict) -> bool:
 
 
 def is_promotional(msg):
-    # imap_tools populates msg.headers as a dictionary of lists
     for param in PROMOTIONAL_PARAMS:
         if param in msg.headers:
             return True
@@ -143,7 +142,6 @@ def is_promotional(msg):
     if any(p.lower() in ["bulk", "list", "junk"] for p in precedence):
         return True
 
-    # Clean unified text extraction provided natively by imap_tools
     body = (msg.text or "") + (msg.html or "")
     body_lower = body.lower()
     for param in UNSUBSCRIBE_PARAMS:

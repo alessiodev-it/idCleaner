@@ -14,7 +14,7 @@ class DeepScanner:
 
     def _log(self, message: str):
         if self.logger:
-            self.logger.write(message)
+            self.logger(message)
 
     def _load_yara_rules(self):
         current_dir = Path(__file__).parent
@@ -38,40 +38,32 @@ class DeepScanner:
         filename = (attachment.filename or "").lower()
         payload = attachment.payload or b""
 
-        # 1. Extension check
         if filename.endswith(BAD_EXT) or self._has_double_extension(filename):
             return True, f"Blocked or suspicious extension on '{filename}'"
 
-        # 2. Magic Bytes / Real MIME Type check
         mime_suspicious, mime_reason = self._check_mime_mismatch(filename, payload)
         if mime_suspicious:
             return True, mime_reason
 
-        # 3. Shannon Entropy check (Obfuscation / Encryption)
         if self._is_entropy_suspicious(filename, payload):
             return True, f"High entropy detected in '{filename}' (possible encryption/obfuscation)"
 
-        # 4. YARA Pattern Matching
         if self.yara_rules:
             matched, rule_names = self._check_yara(payload)
             if matched:
                 return True, f"YARA match on '{filename}': {rule_names}"
 
-        # 5. Zip archive inspection
         if filename.endswith((".zip", ".7z", ".rar")) and self._inspect_zip(payload):
             return True, f"Suspicious activity or hidden threat inside archive '{filename}'"
 
-        # 6. Office VBA macro extraction
         if filename.endswith((".doc", ".xls", ".docm", ".xlsm", ".ppt")) and self._has_dangerous_vba(payload):
             return True, f"Malicious macro or AutoExec routine found in '{filename}'"
 
-        # 7. Executable PE structure check
         if payload.startswith(b"MZ") and self._has_suspicious_pe(payload):
             return True, f"Packed, compressed, or malformed PE structure in '{filename}'"
 
         return False, "Clean"
 
-    # --- INTERNAL CHECKS ---
     def _has_double_extension(self, filename: str) -> bool:
         parts = filename.split(".")
         if len(parts) > 2:
@@ -124,11 +116,11 @@ class DeepScanner:
         try:
             with zipfile.ZipFile(io.BytesIO(payload)) as zf:
                 for zinfo in zf.infolist():
-                    if zinfo.flag_bits & 0x1:  # Encrypted zip
+                    if zinfo.flag_bits & 0x1:
                         return True
-                    if zinfo.filename.lower().endswith(BAD_EXT):  # Malicious internal file
+                    if zinfo.filename.lower().endswith(BAD_EXT):
                         return True
-                    if zinfo.compress_size > 0 and (zinfo.file_size / zinfo.compress_size) > 100:  # Zip Bomb
+                    if zinfo.compress_size > 0 and (zinfo.file_size / zinfo.compress_size) > 100:
                         return True
         except Exception:
             return True

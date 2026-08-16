@@ -15,7 +15,7 @@ _PRINT = True
 
 def worker(stopper, queue_email, queue_update):
     record = Recorder(Path(os.getenv("recorder_mail_worker_path")), _print=_PRINT)
-    record.write("Mail worker started.")
+    record("Mail worker started.")
 
     shared_lists = {"whitelist": set(), "blacklist": set(), "graylist": set()}
 
@@ -38,7 +38,6 @@ def worker(stopper, queue_email, queue_update):
         "groq_api_key": os.getenv("groq_api_key")
     }
     # ========== ========== ==========
-
 
     inbox_cleaner = InboxFolderCleaner(
         SUB_THREAD_NAMES[0],
@@ -81,11 +80,12 @@ def worker(stopper, queue_email, queue_update):
 
     Thread(name="queue_email_listener", target=_queue_listener, daemon=True, args=(stopper, queue_email, shared_lists, record)).start()
     handle_subthreads([inbox_cleaner, bin_cleaner, spam_cleaner, bombsquad_cleaner], stopper, record=record)
-    record.write("End of all sub-thraads worker")
+    record("End of all sub-thraads worker")
 # ========== ========== ==========
 
+
 def _queue_listener(stopper, queue_email, shared_lists, record):
-    record.write("Queue email listener started.")
+    record("Queue email listener started.")
 
     while not stopper.is_set():
         try: payload = queue_email.get(timeout=0.5)
@@ -106,4 +106,4 @@ def _queue_listener(stopper, queue_email, shared_lists, record):
         shared_lists["graylist"].clear()
         shared_lists["graylist"].update(g)
 
-        record.write(f"Shared lists updated in memory: W={len(w)}, B={len(b)}, G={len(g)}")
+        record(f"Shared lists updated in memory: W={len(w)}, B={len(b)}, G={len(g)}")
