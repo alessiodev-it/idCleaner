@@ -32,7 +32,7 @@ def bootstrap():
 
 def _api():
     def get_var(k):
-        return os.getenv(k) or os.getenv(k.upper()) or os.getenv(k.lower())
+        return os.getenv(k)
 
     if all(get_var(k) for k in DEFAULT_ENV):
         return
@@ -84,15 +84,15 @@ def _recorders():
 
     sub_records_dir = records_dir / "mail_worker"
     sub_records_dir.mkdir(exist_ok=True, parents=True)
-    os.environ[f"RECORDER_{sub_records_dir.name}_PATH"] = str(sub_records_dir / f"{sub_records_dir.name}.json")
+    os.environ[f"RECORDER_{sub_records_dir.name.upper()}_PATH"] = str(sub_records_dir / f"{sub_records_dir.name}.json")
     os.environ["RECORDER_MAIN_PATH"] = str(records_dir / "main.json")
 
     for t_name in THREAD_NAMES:
         if t_name != "mail_worker":
-            os.environ[f"RECORDER_{t_name}_PATH"] = str(records_dir / f"{t_name}.json")
+            os.environ[f"RECORDER_{t_name.upper()}_PATH"] = str(records_dir / f"{t_name}.json")
 
     for t_name in SUB_THREAD_NAMES:
-        os.environ[f"RECORDER_{t_name}_PATH"] = str(sub_records_dir / f"{t_name}.json")
+        os.environ[f"RECORDER_{t_name.upper()}_PATH"] = str(sub_records_dir / f"{t_name}.json")
 
 
 """
