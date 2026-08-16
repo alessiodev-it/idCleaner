@@ -31,17 +31,23 @@ def bootstrap():
 #  ========== ========== ==========
 
 def _api():
+    def get_var(k):
+        return os.getenv(k) or os.getenv(k.upper()) or os.getenv(k.lower())
+
+    if all(get_var(k) for k in DEFAULT_ENV):
+        return
+
     env_file = find_dotenv()
+    if env_file:
+        load_dotenv(env_file, override=False)
 
-    if not env_file:
-        env_file = ROOT_DIR / ".env"
-        with open(env_file, "w", encoding="utf-8") as f:
-            f.write("\n".join([f"{k}=" for k in DEFAULT_ENV]))
+    missing = [k.upper() for k in DEFAULT_ENV if not get_var(k)]
 
-    load_dotenv(env_file, override=True)
-
-    if any(not os.getenv(k) for k in DEFAULT_ENV):
-        raise RuntimeError("Environment variables incomplete. Please fill the .env file.")
+    if missing:
+        raise RuntimeError(
+            f"Environment variables incomplete: missing {missing}. "
+            f"Check GitHub Secrets or local .env file."
+        )
 
 
 def _data():
