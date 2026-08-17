@@ -2,7 +2,7 @@ import time, json, os
 
 
 def handle_subthreads(threads, stopper, record=None):
-    record = _if_recorder(recorder)
+    record = _if_recorder(record)
 
     for t in threads:
         t.start()
@@ -19,7 +19,7 @@ def handle_subthreads(threads, stopper, record=None):
 # ========== ========== ==========
 
 def handle_threads(threads, stopper, record=None):
-    record = _if_recorder(recorder)
+    record = _if_recorder(record)
 
     for t in threads:
         t.start()
