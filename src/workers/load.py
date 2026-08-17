@@ -8,6 +8,7 @@ def json_data(stopper, queue_mail, queue_update):
 
     list_path = os.getenv("LIST_PATH")
     raw_list_path = os.getenv("RAW_LIST_PATH")
+    record(f"list_path: {list_path} | raw_list_path: {raw_list_path}")
 
     last_payload = None
     file_need_update = False
@@ -16,11 +17,13 @@ def json_data(stopper, queue_mail, queue_update):
         try:
             with open(list_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
+                record(f"data loaded = {data}")
 
             while not queue_update.empty():
                 try:
                     cmd = queue_update.get(timeout=1.0)
                     action, value = cmd.get("action"), cmd.get("value")
+                    record(f"cmd: {cmd}")
 
                     if not action or not value:
                         continue

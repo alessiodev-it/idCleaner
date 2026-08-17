@@ -24,8 +24,9 @@ def bootstrap():
         for step in (_api, _data, _recorders):
             try:
                 step()
+                rec(f"Succed during '{step.__name__}'")
             except Exception as e:
-                err_msg = f"Bootstrap failed during '{step.__name__}': {e}"
+                err_msg = f"Failed during '{step.__name__}': {e}"
                 rec(err_msg)
                 sys.exit(err_msg)
 #  ========== ========== ==========

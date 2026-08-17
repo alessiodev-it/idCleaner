@@ -7,8 +7,8 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data:/app/data
-      - ./records:/app/records
+      - data:/app/data
+      - records:/app/records
     labels:
       - "homepage.group=Products"
       - "homepage.name=idcleaner"
@@ -17,3 +17,7 @@ services:
       - "homepage.server=my-docker"
       - "homepage.widget.type=docker"
       - "homepage.widget.container=idcleaner"
+
+volumes:
+  data:
+  records:

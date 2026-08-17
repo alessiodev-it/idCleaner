@@ -83,7 +83,6 @@ def worker(stopper, queue_email, queue_update):
     ).start()
 
     handle_subthreads([inbox_cleaner, bin_cleaner, spam_cleaner, bombsquad_cleaner], stopper, record=record)
-    record("End of all sub-threads worker")
 
 
 def _queue_listener(stopper, queue_email, shared_lists, record):

@@ -2,45 +2,45 @@ import time, json, os
 
 
 def handle_subthreads(threads, stopper, record=None):
+    record = _if_recorder(recorder)
+
     for t in threads:
         t.start()
-        if record:
-            record(f"Sub thread [{t.name}] spawned.")
+        record(f"Sub thread [{t.name}] spawned.")
 
     stopper.wait()
 
     for t in threads:
         t.join()
-        if record:
-            record(f"Sub thread [{t.name}] joined.")
+        record(f"Sub thread [{t.name}] joined.")
 
+    record("End of all sub-threads worker")
+    record.join()
+# ========== ========== ==========
 
 def handle_threads(threads, stopper, record=None):
+    record = _if_recorder(recorder)
+
     for t in threads:
         t.start()
-        if record:
-            record(f"Core thread [{t.name}] spawned.")
+        record(f"Core thread [{t.name}] spawned.")
 
     try:
         while not stopper.is_set():
             stopper.wait(timeout=1.0)
     except Exception as e:
-        if record:
-            record(str(e))
+        record(str(e))
     except KeyboardInterrupt:
-        if record:
-            record("Keyboard interrupt")
+        record("Keyboard interrupt")
     finally:
         stopper.set()
 
         for t in threads:
             t.join()
-            if record:
-                record(f"Core thread [{t.name}] killed")
+            record(f"Core thread [{t.name}] killed")
 
-        if record:
-            record("Script closed")
-            record.join()
+        record("Script closed")
+        record.join()
 # ========== ========== ==========
 
 def polling(stopper, seconds):
@@ -50,6 +50,13 @@ def polling(stopper, seconds):
         time.sleep(1)
 # ========== ========== ==========
 
+def _if_recorder(record):
+    if record:
+        return record
+    noop = lambda *args, **kwargs: None
+    noop.join = lambda: None
+    return noop
+# ========== ========== ==========
 
 FOLDER_NAMES = {
     "inbox": "INBOX",

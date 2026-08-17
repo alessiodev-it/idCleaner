@@ -31,10 +31,7 @@ def main():
     handle_threads(
         [json_loader, mail_worker],
         stopper,
-        Recorder(
-            Path(os.getenv("RECORDER_MAIN_PATH")),
-            _print=_PRINT
-        )
+        Recorder(Path(os.getenv("RECORDER_MAIN_PATH")), _print=_PRINT)
     )
 
 if __name__ == "__main__":
